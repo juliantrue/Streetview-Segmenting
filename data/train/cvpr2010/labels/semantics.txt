@@ -1,0 +1,9 @@
+Window = 0
+Wall = 1
+Balcony = 2
+Door = 3
+Roof = 4
+Chimney = 5
+Sky = 6
+Shop = 7
+Outlier = 8

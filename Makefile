@@ -3,6 +3,7 @@ API_KEY = "AIzaSyCkJ1m-ymoFC7hQYdTlROa0bLfiT-EqW9Y"
 BASE_URL = "https://maps.googleapis.com/maps/api/streetview?"
 
 # Directories
+TRAINING_DATA = "./data/train/"
 RAW_DATA = "./data/raw/"
 INTRIM_DATA = "./data/interim/"
 LOGS = "./logs/"
