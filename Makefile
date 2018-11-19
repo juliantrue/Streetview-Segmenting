@@ -1,5 +1,5 @@
 # API Parameters
-API_KEY = "AIzaSyCkJ1m-ymoFC7hQYdTlROa0bLfiT-EqW9Y"
+API_KEY = ""
 BASE_URL = "https://maps.googleapis.com/maps/api/streetview?"
 
 # Directories
