@@ -1,0 +1,5 @@
+# Ignore the following files when building
+
+./data/*
+./logs/*
+./models/*

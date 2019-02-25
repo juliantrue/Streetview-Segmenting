@@ -1,2 +1,4 @@
 # Training data
-data/train/*
+data/*
+models/*
+logs/*

@@ -3,35 +3,61 @@ API_KEY = ""
 BASE_URL = "https://maps.googleapis.com/maps/api/streetview?"
 
 # Directories
-TRAINING_DATA = "./data/train/"
+TRAINING_DATA = "./data/train/facades"
 RAW_DATA = "./data/raw/"
-INTRIM_DATA = "./data/interim/"
+PROCESSED_DATA = "./data/processed"
+MODEL = "./models"
 LOGS = "./logs/"
 INFERENCE_DATA_DIR ?= "./data/raw/location=43.6560811, -79.3801714"
+
+# Location params for streetview
 LATLON ?= "43.6564436,-79.3810598"
 
 .PHONY: clean
 clean:
-	rm -f $(INTRIM_DATA)*
-	rm -f $(LOGS)*.log
+	rm -rf $(LOGS)*.log
 
-.PHONY: inference_mask_RCNN
-inference_mask_RCNN:
-	python3 ./src/Detectron/tools/infer_simple.py \
-    --cfg ./src/Detectron/configs/12_2017_baselines/e2e_mask_rcnn_R-101-FPN_2x.yaml \
-    --output-dir $(INTRIM_DATA) \
-    --image-ext png \
-		--output-ext png \
-    --wts https://s3-us-west-2.amazonaws.com/detectron/35861858/12_2017_baselines/e2e_mask_rcnn_R-101-FPN_2x.yaml.02_32_51.SgT4y1cO/output/train/coco_2014_train:coco_2014_valminusminival/generalized_rcnn/model_final.pkl \
-		$(INFERENCE_DATA_DIR)
-
-
+.PHONY: train_mask_RCNN
+train_mask_RCNN:
+	python3 ./src/facades_base.py train \
+		--dataset $(TRAINING_DATA) \
+		--model ./models \
+		--logs $(LOGS) \
+	&& python3 ./src/facades_h2e_a3e_1000s.py train \
+		--dataset $(TRAINING_DATA) \
+		--model ./models \
+		--logs $(LOGS) \
+	&& python3 ./src/facades_imaug_h2e_a3e_100s.py train \
+		--dataset $(TRAINING_DATA) \
+		--model ./models \
+		--logs $(LOGS) \
+	&& python3 ./src/facades_imaug_h2e_a3e_1000s.py train \
+		--dataset $(TRAINING_DATA) \
+		--model ./models \
+		--logs $(LOGS)
 
 .PHONY: view_stream
 view_stream:
-	python3 ./view_stream.py \
+	python3 ./src/view_stream.py \
 		--path $(RAW_DATA) \
 		--logging_dir $(LOGS) \
 		--key $(API_KEY) \
 		--url $(BASE_URL) \
 		--location $(LATLON)
+
+.PHONY: inference_mask_RCNN
+inference_mask_RCNN:
+	python3 ./src/facades_base.py inference \
+		--model ./models/mask_rcnn_facades3.h5 \
+		--logs $(LOGS) \
+		--dataset $(TRAINING_DATA) \
+		--inference_dir ./data/interim
+
+.PHONY:build-image
+build-image:
+	docker build -t streetview:gpu -f ./build/Dockerfile.DL ./build/
+
+.PHONY: run-image
+run-image:
+	chmod +x ./build/run_image.sh \
+	&& ./build/run_image.sh streetview:gpu ${PWD}
