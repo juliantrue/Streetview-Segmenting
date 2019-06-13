@@ -10,9 +10,6 @@ For complete portability, use the included Dockerfile. The only requirement is t
 Build the docker image `make build-image` and run the container with `make run-image`.
 If you wish to attach multiple bash instances to the running Docker container, simply run `make run-image` again to attach.
 
-## Inferencing on Streetview data
-TBD
-
 ## Training
 In order to train on the provided building facade dataset, run the `make train_mask_RCNN`! Simple 
 
